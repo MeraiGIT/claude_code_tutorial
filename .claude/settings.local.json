@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(sudo npm i:*)",
+      "Bash(claude-code plugins:*)",
+      "Bash(git fetch:*)",
+      "Bash(git reset:*)",
+      "Bash(claude doctor)",
+      "Bash(tree:*)",
+      "Bash(npx create-next-app:*)",
+      "Bash(npm init:*)",
+      "Bash(npm install:*)",
+      "Bash(npx tailwindcss init -p)",
+      "Bash(npm run dev:*)",
+      "Bash(pkill:*)",
+      "Bash(curl:*)",
+      "WebSearch",
+      "Bash(git init:*)"
+    ]
+  }
+}
