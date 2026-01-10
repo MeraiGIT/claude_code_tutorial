@@ -108,14 +108,15 @@ export default function Home() {
         )}
 
         {/* Todo List */}
-        <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2 scrollbar-thin">
+        <div className="space-y-3 max-h-[calc(100vh-32rem)] min-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
           <AnimatePresence mode="popLayout">
             {todos.length === 0 ? (
               <motion.div
                 key="empty"
-                initial={{ opacity: 0, scale: 0.8 }}
+                initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.2 }}
                 className="glass-pearl-dark rounded-2xl p-12 text-center"
               >
                 <motion.div

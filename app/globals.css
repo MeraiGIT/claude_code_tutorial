@@ -97,4 +97,41 @@
   ::-webkit-scrollbar-thumb:hover {
     background: rgb(63 180 199 / 0.7);
   }
+
+  /* Enhanced scrollbar for todo list */
+  .custom-scrollbar {
+    scroll-behavior: smooth;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: rgb(10 22 40 / 0.3);
+    border-radius: 9999px;
+    margin: 4px 0;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgb(63 180 199 / 0.6), rgb(45 122 143 / 0.5));
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, rgb(63 180 199 / 0.8), rgb(45 122 143 / 0.7));
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  /* GPU acceleration for smooth transforms */
+  .transform-gpu {
+    transform: translateZ(0);
+    will-change: transform;
+  }
 }
