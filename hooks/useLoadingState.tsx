@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, createContext, useContext } from 'react';
+import { useState, useEffect, createContext, useContext, useCallback, useMemo } from 'react';
 import type { ReactNode } from 'react';
 
 interface LoadingContextType {
@@ -40,15 +40,18 @@ export function LoadingProvider({
     }
   }, [loadedComponents.size, components.length]);
 
-  const setComponentLoaded = (component: string) => {
+  const setComponentLoaded = useCallback((component: string) => {
     setLoadedComponents((prev) => {
       const newSet = new Set(prev);
       newSet.add(component);
       return newSet;
     });
-  };
+  }, []); // Empty deps - function logic doesn't depend on external values
 
-  const contextValue = { isLoading, setComponentLoaded };
+  const contextValue = useMemo(
+    () => ({ isLoading, setComponentLoaded }),
+    [isLoading, setComponentLoaded]
+  );
 
   return (
     <LoadingContext.Provider value={contextValue}>
