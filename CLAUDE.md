@@ -137,6 +137,41 @@ Custom utility classes:
 **PostCSS Configuration:**
 Must use `@tailwindcss/postcss` plugin (not `tailwindcss` directly) in `postcss.config.js`.
 
+### Responsive Design System
+
+**Mobile-First Approach:**
+The UI is fully responsive with breakpoints following Tailwind's default system:
+- `sm:` - 640px and up (tablet/small desktop)
+- Default (no prefix) - Mobile screens (< 640px)
+
+**Key Responsive Patterns:**
+
+1. **TodoInput Component** (`components/TodoInput.tsx:27-42`):
+   - Layout: `flex-col sm:flex-row` - Vertical stacking on mobile, horizontal on desktop
+   - Padding: `p-4 sm:p-6` - Reduced padding on mobile
+   - Input: `px-4 sm:px-6 py-3 sm:py-4` - Smaller touch targets on mobile
+   - Button: `w-full sm:w-auto` - Full-width on mobile for better touch interaction
+   - Text sizes: `text-base sm:text-lg` - Optimized for mobile readability
+
+2. **Stats Bar** (`app/page.tsx:83-103`):
+   - Layout: `flex-col sm:flex-row` - Vertical stacking on mobile
+   - Stats: `flex-wrap` with responsive gaps (`gap-3 sm:gap-6`)
+   - Clear button: Centered on mobile with `self-center sm:self-auto`
+
+3. **Filter Buttons** (`components/FilterButtons.tsx:36-66`):
+   - Layout: Maintains horizontal layout (better UX than vertical on mobile)
+   - Padding: `p-3 sm:p-4`, `px-3 sm:px-6 py-2.5 sm:py-3`
+   - Text: `text-sm sm:text-base` - Optimized readability
+   - Badges: `text-xs sm:text-sm` with `px-1.5 sm:px-2`
+   - Gaps: `gap-1.5 sm:gap-2` - Tighter spacing on mobile
+
+**Design Principles:**
+- All touch targets are minimum 44px on mobile (iOS guidelines)
+- Full-width buttons on mobile prevent accidental misses
+- Vertical stacking prevents horizontal overflow on small screens
+- Responsive padding prevents cramped layouts on mobile
+- Text sizes scale appropriately for mobile readability
+
 ### Pearl Material Properties
 
 Photorealistic black pearls use `meshPhysicalMaterial` with:
