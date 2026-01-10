@@ -33,7 +33,7 @@ export default function FilterButtons({ currentFilter, onFilterChange, stats }: 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 }}
-      className="glass-pearl-dark rounded-2xl p-4 shadow-pearl"
+      className="glass-pearl-dark rounded-2xl p-3 sm:p-4 shadow-pearl"
     >
       <div className="flex gap-2">
         {filters.map((filter) => {
@@ -46,16 +46,16 @@ export default function FilterButtons({ currentFilter, onFilterChange, stats }: 
               onClick={() => onFilterChange(filter.value)}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className={`flex-1 relative px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
+              className={`flex-1 relative px-3 sm:px-6 py-2.5 sm:py-3 rounded-xl font-medium transition-all duration-300 text-sm sm:text-base ${
                 isActive
                   ? 'bg-gradient-to-r from-atlantis-aqua to-atlantis-teal text-white shadow-glow'
                   : 'bg-atlantis-dark/30 text-atlantis-pearl hover:bg-atlantis-dark/50'
               }`}
             >
-              <span className="relative z-10 flex items-center justify-center gap-2">
+              <span className="relative z-10 flex items-center justify-center gap-1.5 sm:gap-2">
                 {filter.label}
                 <span
-                  className={`text-sm px-2 py-0.5 rounded-full ${
+                  className={`text-xs sm:text-sm px-1.5 sm:px-2 py-0.5 rounded-full ${
                     isActive
                       ? 'bg-white/20'
                       : 'bg-atlantis-teal/30'

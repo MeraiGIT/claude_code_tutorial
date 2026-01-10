@@ -80,9 +80,9 @@ export default function Home() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="glass-pearl-dark rounded-xl p-4 mb-6 flex items-center justify-between"
+            className="glass-pearl-dark rounded-xl p-4 mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0"
           >
-            <div className="flex gap-6 text-sm">
+            <div className="flex flex-wrap justify-center sm:justify-start gap-4 sm:gap-6 text-sm">
               <span className="text-atlantis-pearl">
                 <span className="font-semibold text-atlantis-aqua">{stats.total}</span> total
               </span>
@@ -99,7 +99,7 @@ export default function Home() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={clearCompleted}
-                className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded-lg transition-all text-sm font-medium"
+                className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded-lg transition-all text-sm font-medium self-center sm:self-auto"
               >
                 Clear Completed
               </motion.button>
