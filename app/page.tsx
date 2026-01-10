@@ -77,7 +77,7 @@ export default function Home() {
         )}
 
         {/* Todo List */}
-        <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2">
+        <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2 scrollbar-thin">
           <AnimatePresence mode="popLayout">
             {todos.length === 0 ? (
               <motion.div
@@ -139,19 +139,19 @@ export default function Home() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="mt-12 text-center text-atlantis-teal/60 text-sm"
+          className="mt-12 text-center text-atlantis-pearl/50 text-sm"
         >
           <p>Built with Next.js, React Three Fiber & Framer Motion</p>
           <motion.div
             animate={{
-              opacity: [0.4, 1, 0.4],
+              opacity: [0.6, 1, 0.6],
             }}
             transition={{
               duration: 2,
               repeat: Infinity,
               ease: 'easeInOut',
             }}
-            className="mt-2 text-atlantis-aqua/40"
+            className="mt-2 text-atlantis-aqua/60"
           >
             ✨ Dive deep into productivity ✨
           </motion.div>

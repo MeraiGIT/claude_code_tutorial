@@ -24,15 +24,16 @@ export default function TodoInput({ onAdd }: TodoInputProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
       onSubmit={handleSubmit}
-      className="glass-pearl rounded-2xl p-6 shadow-pearl-lg shimmer"
+      className="glass-pearl rounded-2xl p-6 shadow-pearl-lg"
     >
       <div className="flex gap-3">
         <input
           type="text"
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="Add a new task to your Atlantis collection..."
-          className="flex-1 bg-atlantis-dark/30 text-atlantis-pearl placeholder-atlantis-teal/60 px-6 py-4 rounded-xl border border-atlantis-aqua/20 focus:outline-none focus:border-atlantis-aqua focus:ring-2 focus:ring-atlantis-aqua/30 transition-all text-lg"
+          placeholder="Add a new quest to your underwater kingdom..."
+          autoFocus
+          className="flex-1 bg-atlantis-dark/60 text-atlantis-pearl placeholder-atlantis-pearl/50 px-6 py-4 rounded-xl border border-atlantis-aqua/30 focus:outline-none focus:border-atlantis-aqua focus:ring-2 focus:ring-atlantis-aqua/30 transition-all text-lg font-body"
         />
         <motion.button
           type="submit"
