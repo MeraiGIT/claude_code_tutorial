@@ -26,33 +26,19 @@ export function LoadingProvider({
 }: LoadingProviderProps) {
   const [loadedComponents, setLoadedComponents] = useState<Set<string>>(new Set());
   const [isLoading, setIsLoading] = useState(true);
-  const [mounted, setMounted] = useState(false);
 
+  // Check if ready to hide loading screen - purely component-driven
   useEffect(() => {
-    setMounted(true);
+    const allComponentsLoaded = loadedComponents.size >= components.length;
 
-    // Minimum loading time for smooth transition and to allow scene to start loading (2 seconds)
-    const minLoadingTime = setTimeout(() => {
-      if (loadedComponents.size >= components.length) {
-        setIsLoading(false);
-      }
-    }, 2000);
-
-    return () => clearTimeout(minLoadingTime);
-  }, [loadedComponents, components.length]);
-
-  useEffect(() => {
-    if (!mounted) return;
-
-    // Check if all components are loaded
-    if (loadedComponents.size >= components.length) {
-      // Small delay before hiding loading screen for smooth transition
+    if (allComponentsLoaded) {
+      // Very small delay (200ms) just for smooth fade transition
       const timeout = setTimeout(() => {
         setIsLoading(false);
-      }, 500);
+      }, 200);
       return () => clearTimeout(timeout);
     }
-  }, [loadedComponents, components.length, mounted]);
+  }, [loadedComponents.size, components.length]);
 
   const setComponentLoaded = (component: string) => {
     setLoadedComponents((prev) => {

@@ -38,21 +38,18 @@ export default function Home() {
 
   // Signal when UI components are mounted and ready
   useEffect(() => {
+    // Signal UI is loaded immediately when component mounts
+    setComponentLoaded('ui');
+
     // Check if fonts are loaded
     if (document.fonts && document.fonts.ready) {
       document.fonts.ready.then(() => {
         setComponentLoaded('fonts');
       });
     } else {
+      // No font API support, assume fonts are loaded
       setComponentLoaded('fonts');
     }
-
-    // Signal UI is loaded after a small delay to ensure everything is rendered
-    const timeout = setTimeout(() => {
-      setComponentLoaded('ui');
-    }, 300);
-
-    return () => clearTimeout(timeout);
   }, [setComponentLoaded]);
 
   return (

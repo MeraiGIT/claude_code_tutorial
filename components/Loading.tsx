@@ -1,10 +1,16 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 
 export default function Loading() {
   const [dots, setDots] = useState('');
+  const [mounted, setMounted] = useState(false);
+
+  // Prevent hydration mismatch by only generating random values after mount
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -13,52 +19,73 @@ export default function Loading() {
     return () => clearInterval(interval);
   }, []);
 
+  // Generate stable random values only on client side
+  const bubbles = useMemo(() => {
+    if (!mounted) return [];
+    return [...Array(12)].map((_, i) => ({
+      size: Math.random() * 15 + 10,
+      left: Math.random() * 100,
+      duration: Math.random() * 4 + 6,
+      delay: Math.random() * 4,
+      x: (Math.random() - 0.5) * 80,
+    }));
+  }, [mounted]);
+
+  const particles = useMemo(() => {
+    if (!mounted) return [];
+    return [...Array(8)].map((_, i) => ({
+      left: Math.random() * 100,
+      top: Math.random() * 100,
+      duration: Math.random() * 2 + 2,
+      delay: Math.random() * 2,
+    }));
+  }, [mounted]);
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
+      transition={{ duration: 0.3 }}
       className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-b from-atlantis-dark via-atlantis-deep to-atlantis-ocean"
     >
-      {/* Animated background bubbles - smaller and more subtle */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(30)].map((_, i) => {
-          const size = Math.random() * 20 + 8; // Reduced from 60+20 to 20+8
-          return (
+      {/* Animated background bubbles - optimized */}
+      {mounted && (
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {bubbles.map((bubble, i) => (
             <motion.div
               key={i}
-              className="absolute rounded-full bg-atlantis-aqua/15 backdrop-blur-sm"
+              className="absolute rounded-full bg-atlantis-aqua/10 backdrop-blur-sm border border-atlantis-aqua/20"
               style={{
-                width: size,
-                height: size,
-                left: `${Math.random() * 100}%`,
+                width: bubble.size,
+                height: bubble.size,
+                left: `${bubble.left}%`,
                 bottom: -50,
-                boxShadow: '0 0 10px rgba(109, 213, 237, 0.2)',
               }}
               animate={{
-                y: [-50, -1000],
-                x: [0, (Math.random() - 0.5) * 100],
-                opacity: [0, 0.4, 0],
-                scale: [0.8, 1.2, 0.8],
+                y: [-50, -window.innerHeight - 50],
+                x: [0, bubble.x],
+                opacity: [0, 0.6, 0],
+                scale: [0.8, 1.1, 0.9],
               }}
               transition={{
-                duration: Math.random() * 5 + 8,
+                duration: bubble.duration,
                 repeat: Infinity,
-                delay: Math.random() * 6,
+                delay: bubble.delay,
                 ease: 'easeInOut',
               }}
             />
-          );
-        })}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* Main loading content */}
       <div className="relative z-10 flex flex-col items-center gap-8">
         {/* Animated pearls in circular formation */}
-        <div className="relative w-40 h-40">
+        <div className="relative w-44 h-44">
           {[...Array(8)].map((_, i) => {
             const angle = (i * 360) / 8;
-            const delay = i * 0.12;
+            const delay = i * 0.1;
 
             return (
               <motion.div
@@ -68,35 +95,36 @@ export default function Loading() {
                   top: '50%',
                   left: '50%',
                   transformOrigin: '0 0',
-                  boxShadow: '0 0 15px rgba(109, 213, 237, 0.6), 0 0 25px rgba(109, 213, 237, 0.3)',
+                  boxShadow:
+                    '0 0 15px rgba(109, 213, 237, 0.6), 0 0 25px rgba(63, 180, 199, 0.3)',
                 }}
                 animate={{
                   rotate: 360,
-                  scale: [1, 1.4, 1],
-                  opacity: [0.5, 1, 0.5],
+                  scale: [1, 1.3, 1],
+                  opacity: [0.6, 1, 0.6],
                 }}
                 transition={{
                   rotate: {
-                    duration: 4,
+                    duration: 3.5,
                     repeat: Infinity,
                     ease: 'linear',
                   },
                   scale: {
-                    duration: 1.6,
+                    duration: 1.4,
                     repeat: Infinity,
                     delay,
                     ease: 'easeInOut',
                   },
                   opacity: {
-                    duration: 1.6,
+                    duration: 1.4,
                     repeat: Infinity,
                     delay,
                     ease: 'easeInOut',
                   },
                 }}
                 initial={{
-                  x: Math.cos((angle * Math.PI) / 180) * 60,
-                  y: Math.sin((angle * Math.PI) / 180) * 60,
+                  x: Math.cos((angle * Math.PI) / 180) * 65,
+                  y: Math.sin((angle * Math.PI) / 180) * 65,
                 }}
               />
             );
@@ -104,23 +132,24 @@ export default function Loading() {
 
           {/* Center pearl */}
           <motion.div
-            className="absolute top-1/2 left-1/2 w-10 h-10 rounded-full bg-gradient-to-br from-white via-atlantis-light to-atlantis-aqua"
+            className="absolute top-1/2 left-1/2 w-12 h-12 rounded-full bg-gradient-to-br from-white via-atlantis-light to-atlantis-aqua"
             style={{
               transform: 'translate(-50%, -50%)',
-              boxShadow: '0 0 40px rgba(109, 213, 237, 0.8), 0 0 60px rgba(109, 213, 237, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.4)',
+              boxShadow:
+                '0 0 40px rgba(109, 213, 237, 0.9), 0 0 60px rgba(63, 180, 199, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.5)',
             }}
             animate={{
-              scale: [1, 1.25, 1],
+              scale: [1, 1.2, 1],
               rotate: [0, 180, 360],
             }}
             transition={{
               scale: {
-                duration: 2.5,
+                duration: 2.2,
                 repeat: Infinity,
                 ease: 'easeInOut',
               },
               rotate: {
-                duration: 5,
+                duration: 4.5,
                 repeat: Infinity,
                 ease: 'linear',
               },
@@ -131,71 +160,78 @@ export default function Loading() {
         {/* Loading text */}
         <motion.div
           className="text-center"
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
         >
           <h2
-            className="font-heading text-4xl text-atlantis-light mb-2"
+            className="font-heading text-5xl text-atlantis-light mb-3"
             style={{
-              textShadow: '0 0 20px rgba(109, 213, 237, 0.8), 0 0 40px rgba(109, 213, 237, 0.4)',
-              letterSpacing: '0.15em',
+              textShadow:
+                '0 0 25px rgba(109, 213, 237, 0.9), 0 0 50px rgba(63, 180, 199, 0.5), 0 0 70px rgba(63, 180, 199, 0.3)',
+              letterSpacing: '0.2em',
             }}
           >
             ATLANTIS
           </h2>
-          <p className="font-ui text-atlantis-aqua/90 text-lg tracking-wide">
+          <p className="font-ui text-atlantis-aqua text-lg tracking-widest">
             Diving into the depths{dots}
           </p>
         </motion.div>
 
-        {/* Progress bar */}
+        {/* Progress bar - improved design */}
         <motion.div
-          className="w-80 h-1.5 bg-atlantis-deep/50 rounded-full overflow-hidden"
-          initial={{ opacity: 0, scale: 0.8 }}
+          className="w-96 h-2 bg-atlantis-deep/60 rounded-full overflow-hidden backdrop-blur-sm border border-atlantis-aqua/20"
+          initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.5 }}
+          transition={{ delay: 0.4, duration: 0.4 }}
         >
           <motion.div
-            className="h-full bg-gradient-to-r from-atlantis-aqua via-atlantis-light to-atlantis-aqua rounded-full"
+            className="h-full rounded-full relative"
             style={{
-              boxShadow: '0 0 20px rgba(109, 213, 237, 0.8), 0 0 30px rgba(109, 213, 237, 0.4)',
+              background:
+                'linear-gradient(90deg, rgba(63, 180, 199, 0.4) 0%, rgba(109, 213, 237, 1) 50%, rgba(63, 180, 199, 0.4) 100%)',
+              boxShadow:
+                '0 0 25px rgba(109, 213, 237, 0.9), 0 0 40px rgba(109, 213, 237, 0.5)',
             }}
             animate={{
               x: ['-100%', '200%'],
             }}
             transition={{
-              duration: 1.8,
+              duration: 1.5,
               repeat: Infinity,
               ease: 'easeInOut',
             }}
           />
         </motion.div>
 
-        {/* Floating particles */}
-        <div className="absolute inset-0 pointer-events-none">
-          {[...Array(15)].map((_, i) => (
-            <motion.div
-              key={`particle-${i}`}
-              className="absolute w-1 h-1 bg-atlantis-light/60 rounded-full"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-              }}
-              animate={{
-                y: [0, -30, 0],
-                opacity: [0.2, 0.8, 0.2],
-                scale: [1, 1.5, 1],
-              }}
-              transition={{
-                duration: Math.random() * 3 + 2,
-                repeat: Infinity,
-                delay: Math.random() * 2,
-                ease: 'easeInOut',
-              }}
-            />
-          ))}
-        </div>
+        {/* Floating particles - optimized */}
+        {mounted && (
+          <div className="absolute inset-0 pointer-events-none">
+            {particles.map((particle, i) => (
+              <motion.div
+                key={`particle-${i}`}
+                className="absolute w-1 h-1 bg-atlantis-light/70 rounded-full"
+                style={{
+                  left: `${particle.left}%`,
+                  top: `${particle.top}%`,
+                  boxShadow: '0 0 4px rgba(109, 213, 237, 0.6)',
+                }}
+                animate={{
+                  y: [0, -25, 0],
+                  opacity: [0.3, 1, 0.3],
+                  scale: [1, 1.4, 1],
+                }}
+                transition={{
+                  duration: particle.duration,
+                  repeat: Infinity,
+                  delay: particle.delay,
+                  ease: 'easeInOut',
+                }}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </motion.div>
   );
