@@ -1,7 +1,7 @@
 # CONTEXT.md
 
 **Last Updated:** 2026-01-10
-**Status:** 🔴 CRITICAL BUG - Loading state stuck infinitely
+**Status:** ✅ WORKING - Loading bug fixed
 
 ## 1. What We're Building
 
@@ -59,7 +59,7 @@
 - Lazy loading: Environment map loads after critical scene via Suspense
 - useMemo: All static geometry/material data
 
-### 2.2 Loading State System (⚠️ BROKEN)
+### 2.2 Loading State System (✅ FIXED)
 
 **Components:**
 - `LoadingProvider` - Context that tracks component loading
@@ -67,17 +67,17 @@
 - `Loading` - Visual loading component with pearl animations
 - `AppContent` - Wrapper that shows/hides loading screen
 
-**How It Should Work:**
+**How It Works:**
 1. App starts with `isLoading: true`
-2. Three components signal when loaded:
-   - `'scene'` - 3D scene mounted (100ms delay)
+2. Two components signal when loaded:
    - `'ui'` - UI components rendered (300ms delay)
    - `'fonts'` - Custom fonts loaded (document.fonts.ready)
-3. Once all 3 loaded, wait 500ms then hide loading screen
-4. Minimum display time: 1 second
+3. Minimum loading time: 2 seconds (allows 3D scene to start loading in background)
+4. Once both loaded, wait 500ms then hide loading screen
+5. Total typical load time: ~2.5 seconds
 
-**Current Problem (CRITICAL BUG):**
-Loading state runs forever - app never becomes visible. The `Scene` component inside `UnderwaterScene` likely never mounts because it's dynamically imported, so `setComponentLoaded('scene')` never fires.
+**Fix Applied (2026-01-10):**
+Removed `'scene'` tracking from LoadingProvider. The dynamically imported UnderwaterScene was unreliable for signaling load completion. Now the 3D scene loads in background while loading screen shows for a fixed duration based on UI/font readiness.
 
 ### 2.3 State Management
 
@@ -91,7 +91,7 @@ Loading state runs forever - app never becomes visible. The `Scene` component in
 **Loading State (`hooks/useLoadingState.tsx`):**
 - Context-based
 - Tracks Set of loaded component names
-- Issues: Not detecting dynamic imports properly
+- Fixed: No longer tracks unreliable dynamic imports (removed 'scene' tracking)
 
 ### 2.4 Styling System
 
@@ -231,12 +231,11 @@ package.json
    - Added vercel.json for git deployment config
    - Verified auto-deploy works (triggers on push)
 
-3. **Loading State Implementation** ⚠️ BROKEN
+3. **Loading State Implementation** ✅ FIXED
    - Created Loading.tsx component with pearl animations
    - Created LoadingProvider and useLoadingState hook
    - Integrated into app/layout.tsx
-   - Updated UnderwaterScene.tsx to call setComponentLoaded('scene')
-   - Updated app/page.tsx to call setComponentLoaded('ui' and 'fonts')
+   - Initially tracked 'scene', 'ui', 'fonts' components
 
 4. **Playwright Testing & UI Improvements** ✅
    - Used Playwright to capture loading state screenshots
@@ -247,111 +246,69 @@ package.json
      * Pearl formation too small → increased to 40px
    - Committed improvements
 
-5. **CRITICAL BUG DISCOVERED** 🔴
-   - User reported: "loading state runs forever, app never loads"
-   - Cause: `Scene` component inside dynamically imported `UnderwaterScene` never mounts
-   - The `setComponentLoaded('scene')` call never happens
-   - App stuck on loading screen indefinitely
+5. **CRITICAL BUG FIX** ✅ RESOLVED
+   - Issue: Loading state ran forever, app never became visible
+   - Root cause: `Scene` component inside dynamically imported `UnderwaterScene` never reliably signaled load completion
+   - Solution: Removed 'scene' from component tracking in LoadingProvider
+   - Changes:
+     * LoadingProvider now only tracks ['ui', 'fonts']
+     * Removed setComponentLoaded('scene') call from UnderwaterScene
+     * Increased minimum loading time to 2 seconds
+     * 3D scene now loads in background during loading screen
+   - Status: ✅ FIXED and deployed (commit: 032824b)
 
 ### Current State of Loading Logic:
 
-**Expected behavior:**
+**How it works (FIXED):**
 ```
 1. App mounts with isLoading: true
-2. Scene component mounts → setComponentLoaded('scene') after 100ms
-3. Page component mounts → setComponentLoaded('ui') after 300ms
-4. Fonts load → setComponentLoaded('fonts') via document.fonts.ready
-5. All 3 loaded → wait 500ms → setIsLoading(false)
+2. Page component mounts → setComponentLoaded('ui') after 300ms
+3. Fonts load → setComponentLoaded('fonts') via document.fonts.ready
+4. LoadingProvider has 2-second minimum display timer
+5. Once both 'ui' and 'fonts' loaded + minimum time passed → wait 500ms → setIsLoading(false)
 6. Loading screen fades out, app becomes visible
+7. 3D UnderwaterScene loads in background during and after loading screen
 ```
 
-**Actual behavior:**
-```
-1. App mounts with isLoading: true
-2. UnderwaterScene is dynamically imported (ssr: false)
-3. Scene component never mounts or mount is delayed
-4. setComponentLoaded('scene') NEVER fires
-5. Loading screen stays forever ❌
-```
+**Typical timeline:**
+- T+0ms: App starts, loading screen visible
+- T+300ms: UI signals loaded
+- T+~500ms: Fonts signal loaded
+- T+2000ms: Minimum loading time reached
+- T+2500ms: Loading screen fades out (after 500ms delay)
+- T+2500ms+: App fully interactive with 3D scene rendering
 
 ---
 
-## 5. Next Steps - FIXING THE LOADING STATE
+## 5. Future Enhancements
 
-### Immediate Action Required:
+Now that the critical loading bug is fixed, here are potential improvements:
 
-**Problem:** Dynamic import of `UnderwaterScene` prevents `Scene` component from mounting quickly enough, so `setComponentLoaded('scene')` never fires.
+### Performance Optimizations:
+1. Add performance mode toggle for low-end devices
+2. Implement progressive enhancement for 3D scene
+3. Add reduced motion support for accessibility
+4. Optimize bundle size further
 
-**Solution Options:**
+### Feature Additions:
+1. Add favicon.ico to eliminate 404 error
+2. Implement todo categories or tags
+3. Add drag-and-drop reordering
+4. Export/import todos functionality
+5. Add keyboard shortcuts
 
-#### Option A: Simplify - Remove Scene Tracking (RECOMMENDED)
-The easiest fix:
-1. Remove `'scene'` from the components array in LoadingProvider
-2. Only track `'ui'` and `'fonts'`
-3. Set a fixed timer (e.g., 2-3 seconds) for loading screen minimum duration
-4. Scene loads in background while loading screen shows
-
-**Implementation:**
-```typescript
-// hooks/useLoadingState.tsx - Update components default
-components = ['ui', 'fonts']  // Remove 'scene'
-
-// Add minimum duration timer
-useEffect(() => {
-  const minDuration = setTimeout(() => {
-    if (loadedComponents.size >= components.length) {
-      setIsLoading(false);
-    }
-  }, 2000); // Show loading for at least 2 seconds
-  return () => clearTimeout(minDuration);
-}, [loadedComponents, components.length]);
-```
-
-#### Option B: Fix Scene Detection
-More complex but tracks actual scene loading:
-1. Move `setComponentLoaded('scene')` call outside of `Scene` component
-2. Put it in `UnderwaterScene` component's useEffect
-3. Or use the dynamic import's `onLoad` callback (if available)
-
-#### Option C: Remove Loading State Entirely
-If user just wants instant app loading:
-1. Remove LoadingProvider wrapper
-2. Remove Loading component
-3. Remove AppContent wrapper
-4. App shows immediately with scene loading in background
-
-### Testing Plan:
-
-After implementing fix:
-1. Test locally: `npm run dev` and verify app loads
-2. Test build: `npm run build` and check for errors
-3. Push to GitHub and verify Vercel deployment
-4. Use Playwright to capture before/after loading behavior
-5. Verify smooth transition from loading → app
-
-### Files to Modify:
-
-**Priority 1 (Critical):**
-- `hooks/useLoadingState.tsx` - Simplify component tracking
-- `components/UnderwaterScene.tsx` - Remove scene loading signal (or move it)
-- `app/page.tsx` - Possibly simplify
-
-**Priority 2 (Testing):**
-- Use Playwright to verify fix works
-- Capture new screenshots
-
-**Priority 3 (Documentation):**
-- Update CLAUDE.md with loading state changes
-- Update this CONTEXT.md after fix is complete
+### UX Improvements:
+1. Add onboarding tutorial for first-time users
+2. Implement undo/redo functionality
+3. Add todo search/filter by text
+4. Add due dates and reminders
 
 ---
 
 ## 6. Known Issues
 
 ### Critical (Blocking):
-1. **Loading state stuck infinitely** - Scene component never signals it loaded
-   - Impact: App unusable on production
-   - Priority: P0 - FIX IMMEDIATELY
+None! All critical issues resolved.
 
 ### Minor:
 1. **Favicon 404** - No favicon.ico file
