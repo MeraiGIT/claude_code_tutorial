@@ -1,12 +1,11 @@
 'use client';
 
-import { useRef, useMemo, useState, Suspense, useEffect } from 'react';
+import { useRef, useMemo, useState, Suspense } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Points, PointMaterial, Environment, Trail } from '@react-three/drei';
 import * as THREE from 'three';
 import { useMousePosition } from '@/hooks/useMousePosition';
 import { CausticShaderMaterial, GodRaysShaderMaterial } from './shaders/CausticShader';
-import { useLoadingState } from '@/hooks/useLoadingState';
 
 // Mouse context to share position across components
 const MouseContext = React.createContext<THREE.Vector3>(new THREE.Vector3());
@@ -491,17 +490,6 @@ function PearlLighting() {
 function Scene() {
   const mousePosition3D = useMousePosition();
   const [pearlPositions, setPearlPositions] = useState<THREE.Vector3[]>([]);
-  const { setComponentLoaded } = useLoadingState();
-  const [sceneReady, setSceneReady] = useState(false);
-
-  // Signal when scene is mounted and initial frame is rendered
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setSceneReady(true);
-      setComponentLoaded('scene');
-    }, 100);
-    return () => clearTimeout(timeout);
-  }, [setComponentLoaded]);
 
   return (
     <>

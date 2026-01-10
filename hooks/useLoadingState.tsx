@@ -22,7 +22,7 @@ interface LoadingProviderProps {
 
 export function LoadingProvider({
   children,
-  components = ['scene', 'ui', 'fonts']
+  components = ['ui', 'fonts']  // Removed 'scene' - 3D scene loads in background
 }: LoadingProviderProps) {
   const [loadedComponents, setLoadedComponents] = useState<Set<string>>(new Set());
   const [isLoading, setIsLoading] = useState(true);
@@ -31,15 +31,15 @@ export function LoadingProvider({
   useEffect(() => {
     setMounted(true);
 
-    // Minimum loading time for smooth transition (1 second)
+    // Minimum loading time for smooth transition and to allow scene to start loading (2 seconds)
     const minLoadingTime = setTimeout(() => {
       if (loadedComponents.size >= components.length) {
         setIsLoading(false);
       }
-    }, 1000);
+    }, 2000);
 
     return () => clearTimeout(minLoadingTime);
-  }, []);
+  }, [loadedComponents, components.length]);
 
   useEffect(() => {
     if (!mounted) return;
