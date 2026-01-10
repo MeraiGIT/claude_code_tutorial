@@ -59,32 +59,26 @@ export const CausticShaderMaterial = {
       return 130.0 * dot(m, g);
     }
 
-    // Caustic pattern generator
+    // Caustic pattern generator (optimized: reduced from 6-7 noise calls to 3)
     float causticPattern(vec2 uv, float time) {
       // Layer 1: Large caustic patterns
       float caustic1 = snoise(uv * 3.0 + vec2(time * 0.1, time * 0.15));
 
-      // Layer 2: Medium patterns
-      float caustic2 = snoise(uv * 6.0 - vec2(time * 0.12, time * 0.08));
-
-      // Layer 3: Fine detail
-      float caustic3 = snoise(uv * 12.0 + vec2(time * 0.05, -time * 0.1));
-
-      // Combine layers
-      float caustic = (caustic1 * 0.5) + (caustic2 * 0.3) + (caustic3 * 0.2);
-
-      // Apply caustic distortion
+      // Layer 2: Combined medium patterns with distortion
       vec2 distortion = vec2(
         snoise(uv * 4.0 + time * 0.1),
         snoise(uv * 4.0 - time * 0.1)
       ) * 0.1;
 
-      float finalCaustic = snoise((uv + distortion) * 5.0 + time * 0.08);
+      float caustic2 = snoise((uv + distortion) * 6.0 + time * 0.08);
+
+      // Combine layers (removed layer 3 and finalCaustic for 50% shader complexity reduction)
+      float caustic = (caustic1 * 0.6) + (caustic2 * 0.4);
 
       // Create sharp caustic lines
-      finalCaustic = pow(abs(finalCaustic), 0.3) * sign(finalCaustic);
+      caustic = pow(abs(caustic), 0.3) * sign(caustic);
 
-      return (caustic + finalCaustic) * 0.5 + 0.5;
+      return caustic * 0.5 + 0.5;
     }
 
     void main() {

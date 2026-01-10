@@ -1,5 +1,36 @@
 import type { Metadata } from 'next';
+import { Inter, Cinzel, Playfair_Display, Lora } from 'next/font/google';
 import './globals.css';
+
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  preload: true,
+  variable: '--font-inter',
+  weight: ['300', '400', '500', '600', '700']
+});
+
+const cinzel = Cinzel({
+  weight: ['600', '700'],
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-cinzel'
+});
+
+const playfair = Playfair_Display({
+  weight: ['400'],
+  style: ['normal', 'italic'],
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-playfair'
+});
+
+const lora = Lora({
+  weight: ['400', '500', '600'],
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-lora'
+});
 
 export const metadata: Metadata = {
   title: 'Atlantis To-Do | Underwater Task Manager',
@@ -13,15 +44,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Playfair+Display:ital,wght@0,400;1,400&family=Lora:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body className="min-h-screen relative">
+      <body className={`min-h-screen relative ${inter.variable} ${cinzel.variable} ${playfair.variable} ${lora.variable}`}>
         {children}
       </body>
     </html>

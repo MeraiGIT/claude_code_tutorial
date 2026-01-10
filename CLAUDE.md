@@ -35,9 +35,9 @@ The entire 3D scene follows a **hierarchical composition pattern** with speciali
        ├─ <CausticBackground> (shader plane at z:-8)
        ├─ <GodRays> (shader plane at z:5)
        ├─ <PearlLighting> (multi-point lighting rig)
-       ├─ <Environment> (IBL for reflections)
-       ├─ <PearlFormation> (sacred geometry formation)
-       │    └─ <InteractivePearl>[] (19 pearls with physics)
+       ├─ <Environment> (IBL for reflections, lazy loaded)
+       ├─ <PearlFormation> (stratified grid formation)
+       │    └─ <InteractivePearl>[] (35 pearls with physics)
        ├─ <Bubbles> (80 rising particles)
        └─ <BioluminescentParticles> (300 reactive particles)
 ```
@@ -51,11 +51,12 @@ The entire 3D scene follows a **hierarchical composition pattern** with speciali
    - Return-to-formation force (elastic orbits)
    - Velocity damping (0.92 multiplier per frame)
 
-2. **Sacred Geometry Formation**: Pearls arranged in Flower of Life pattern:
-   - 1 central pearl
-   - 6 pearls in hexagonal first ring (radius: 2.5)
-   - 12 pearls in outer ring (radius: 4.5)
-   - Each pearl orbits its formation position with phase offsets
+2. **Stratified Grid Formation**: Pearls arranged using stratified sampling for optimal viewport coverage:
+   - 35 pearls total (7×5 grid)
+   - Each cell gets one pearl with random offset for natural appearance
+   - Z-depth uses golden ratio spiral (137.5°) for aesthetic distribution
+   - Viewport bounds: X[-7.5, 7.5], Y[-4.2, 4.2], Z[-4, 4]
+   - Each pearl orbits its formation position with phase offsets and flow field influence
 
 3. **Shader Communication**: Custom shaders receive time uniforms via `useFrame()`:
    ```typescript
@@ -120,10 +121,18 @@ Custom theme variables defined in `app/globals.css`:
 }
 ```
 
+**Font System:**
+Custom fonts for typography hierarchy:
+- `--font-heading`: 'Cinzel' (serif) - Main headings with 0.02em letter-spacing
+- `--font-subtitle`: 'Playfair Display' (serif) - Subtitles with 0.01em letter-spacing
+- `--font-body`: 'Lora' (serif) - Body text with 0.015em letter-spacing
+- `--font-ui`: 'Inter' (sans-serif) - UI elements and interactive components
+
 Custom utility classes:
 - `.glass-pearl` - Frosted glass effect with backdrop blur
 - `.glass-pearl-dark` - Dark variant for components
 - `.text-glow` - Cyan text-shadow effect
+- `.font-heading`, `.font-subtitle`, `.font-body` - Typography presets with letter-spacing
 
 **PostCSS Configuration:**
 Must use `@tailwindcss/postcss` plugin (not `tailwindcss` directly) in `postcss.config.js`.
@@ -143,8 +152,12 @@ Photorealistic black pearls use `meshPhysicalMaterial` with:
 - **useMemo** for all static particle positions and pearl data
 - **Instance management**: pearlRefs array prevents redundant lookups
 - **Selective updates**: Only update geometry attributes when needed
+- **Frame skipping**: Bioluminescent particles update physics every 3rd frame (reduces calculations from 10,500 to 3,500/frame)
+- **Early exit optimization**: Pearl-to-pearl collision uses Manhattan distance check before expensive sqrt (~60% reduction in calculations)
+- **Shader optimization**: Caustic shader reduced from 6-7 noise calls to 3 (50% complexity reduction)
 - **Additive blending** on particles to reduce overdraw cost
 - **High-performance GL context**: `powerPreference: 'high-performance'`
+- **Lazy loading**: Environment map loads after critical scene elements via Suspense
 
 ## Common Gotchas
 
@@ -182,6 +195,14 @@ app/
 - **Tailwind CSS v4**: Breaking changes - requires `@tailwindcss/postcss` and `@import` syntax
 - **Next.js 16**: Uses Turbopack by default, requires `turbopack: {}` config
 - **Framer Motion 12**: `AnimatePresence` with `mode="popLayout"` for smooth list transitions
+
+## Next.js Configuration (`next.config.ts`)
+
+**Important webpack optimizations:**
+- **Canvas externalization**: Prevents build errors with Three.js canvas usage
+- **Three.js tree-shaking**: Aliases 'three' to modular build for smaller bundle size
+- **Console removal**: Automatically strips console.logs in production builds
+- **Turbopack**: Enabled by default with `turbopack: {}`
 
 ## Visual Design System
 

@@ -1,12 +1,23 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
+import dynamic from 'next/dynamic';
 import { useTodos } from '@/hooks/useTodos';
-import UnderwaterScene from '@/components/UnderwaterScene';
 import Header from '@/components/Header';
 import TodoInput from '@/components/TodoInput';
 import TodoItem from '@/components/TodoItem';
 import FilterButtons from '@/components/FilterButtons';
+
+// Dynamically import 3D scene to reduce initial bundle and enable progressive loading
+const UnderwaterScene = dynamic(
+  () => import('@/components/UnderwaterScene'),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="fixed inset-0 -z-10 bg-atlantis-dark" />
+    )
+  }
+);
 
 export default function Home() {
   const {
@@ -138,23 +149,20 @@ export default function Home() {
         <motion.footer
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="mt-12 text-center text-atlantis-pearl/50 text-sm"
+          transition={{ delay: 0.8 }}
+          className="mt-16 pb-8 text-center text-atlantis-pearl/30 text-xs"
         >
-          <p>Built with Next.js, React Three Fiber & Framer Motion</p>
-          <motion.div
-            animate={{
-              opacity: [0.6, 1, 0.6],
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: 'easeInOut',
-            }}
-            className="mt-2 text-atlantis-aqua/60"
-          >
-            ✨ Dive deep into productivity ✨
-          </motion.div>
+          <div className="inline-flex items-center gap-2">
+            <span>Made with</span>
+            <motion.span
+              animate={{ scale: [1, 1.2, 1] }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+              className="text-atlantis-aqua/60"
+            >
+              ♥
+            </motion.span>
+            <span>© 2026</span>
+          </div>
         </motion.footer>
       </div>
 
