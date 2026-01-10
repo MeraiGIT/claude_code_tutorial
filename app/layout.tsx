@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { Inter, Cinzel, Playfair_Display, Lora } from 'next/font/google';
 import './globals.css';
+import { LoadingProvider } from '@/hooks/useLoadingState';
+import AppContent from '@/components/AppContent';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -45,7 +47,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`min-h-screen relative ${inter.variable} ${cinzel.variable} ${playfair.variable} ${lora.variable}`}>
-        {children}
+        <LoadingProvider>
+          <AppContent>
+            {children}
+          </AppContent>
+        </LoadingProvider>
       </body>
     </html>
   );

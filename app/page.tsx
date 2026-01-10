@@ -2,7 +2,9 @@
 
 import { AnimatePresence, motion } from 'framer-motion';
 import dynamic from 'next/dynamic';
+import { useEffect } from 'react';
 import { useTodos } from '@/hooks/useTodos';
+import { useLoadingState } from '@/hooks/useLoadingState';
 import Header from '@/components/Header';
 import TodoInput from '@/components/TodoInput';
 import TodoItem from '@/components/TodoItem';
@@ -31,6 +33,27 @@ export default function Home() {
     setFilter,
     clearCompleted,
   } = useTodos();
+
+  const { setComponentLoaded } = useLoadingState();
+
+  // Signal when UI components are mounted and ready
+  useEffect(() => {
+    // Check if fonts are loaded
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => {
+        setComponentLoaded('fonts');
+      });
+    } else {
+      setComponentLoaded('fonts');
+    }
+
+    // Signal UI is loaded after a small delay to ensure everything is rendered
+    const timeout = setTimeout(() => {
+      setComponentLoaded('ui');
+    }, 300);
+
+    return () => clearTimeout(timeout);
+  }, [setComponentLoaded]);
 
   return (
     <main className="min-h-screen relative overflow-hidden">
